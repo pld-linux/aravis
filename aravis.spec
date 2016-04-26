@@ -4,7 +4,7 @@
 %bcond_without	gstreamer	# alias to disable both GStreamer plugins
 %bcond_without	gstreamer1	# GStreamer 1 plugin
 %bcond_without	gstreamer0_10	# GStreamer 0.10 plugin
-#
+
 %if %{without gstreamer}
 %undefine	with_gstreamer1
 %undefine	with_gstreamer0_10
@@ -13,7 +13,7 @@ Summary:	Aravis digital video camera acquisition library
 Summary(pl.UTF-8):	Aravis - biblioteka do pobierania obrazu z kamer cyfrowych
 Name:		aravis
 Version:	0.3.8
-Release:	1
+Release:	2
 License:	LGPL v2+
 Group:		Libraries
 Source0:	http://ftp.gnome.org/pub/GNOME/sources/aravis/0.3/%{name}-%{version}.tar.xz
@@ -52,8 +52,8 @@ protocol used for industrial cameras.
 
 %description -l pl.UTF-8
 Aravis to oparta na GLib/GObject biblioteka do pobierania obrazu przy
-użyciu kamer Genicam. Obecnie ma zaimplementowany tylko protokół
-kamer ethernetowych używany przez kamery przemysłowe.
+użyciu kamer Genicam. Obecnie ma zaimplementowany tylko protokół kamer
+ethernetowych używany przez kamery przemysłowe.
 
 %package viewer
 Summary:	Simple viewer of video stream acquired using Aravis
@@ -103,6 +103,9 @@ Summary:	API documentation for Aravis library
 Summary(pl.UTF-8):	Dokumentacja API biblioteki Aravis
 Group:		Documentation
 Requires:	gtk-doc-common
+%if "%{_rpmversion}" >= "5"
+BuildArch:	noarch
+%endif
 
 %description apidocs
 API documentation for Aravis library.
