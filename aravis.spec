@@ -12,12 +12,12 @@
 Summary:	Aravis digital video camera acquisition library
 Summary(pl.UTF-8):	Aravis - biblioteka do pobierania obrazu z kamer cyfrowych
 Name:		aravis
-Version:	0.3.8
-Release:	2
+Version:	0.4.1
+Release:	1
 License:	LGPL v2+
 Group:		Libraries
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/aravis/0.3/%{name}-%{version}.tar.xz
-# Source0-md5:	a09325d614fa4ffa9d7227489fb89a25
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/aravis/0.4/%{name}-%{version}.tar.xz
+# Source0-md5:	6ce58d4755c1181e04237d528ed46179
 URL:		https://wiki.gnome.org/Projects/Aravis
 BuildRequires:	appstream-glib-devel
 BuildRequires:	gettext-tools
@@ -187,7 +187,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %files -f %{name}-0.4.lang
 %defattr(644,root,root,755)
-%doc AUTHORS NEWS README TODO
+%doc AUTHORS NEWS README.md TODO
 %attr(755,root,root) %{_bindir}/arv-fake-gv-camera-0.4
 %attr(755,root,root) %{_bindir}/arv-tool-0.4
 %attr(755,root,root) %{_libdir}/libaravis-0.4.so.*.*.*
