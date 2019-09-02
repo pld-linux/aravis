@@ -12,14 +12,15 @@
 Summary:	Aravis digital video camera acquisition library
 Summary(pl.UTF-8):	Aravis - biblioteka do pobierania obrazu z kamer cyfrowych
 Name:		aravis
-Version:	0.4.1
+Version:	0.6.4
 Release:	1
 License:	LGPL v2+
 Group:		Libraries
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/aravis/0.4/%{name}-%{version}.tar.xz
-# Source0-md5:	6ce58d4755c1181e04237d528ed46179
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/aravis/0.6/%{name}-%{version}.tar.xz
+# Source0-md5:	632227c75701dd687648b01e54a03206
 URL:		https://wiki.gnome.org/Projects/Aravis
 BuildRequires:	appstream-glib-devel
+BuildRequires:	audit-libs-devel
 BuildRequires:	gettext-tools
 BuildRequires:	glib2-devel >= 1:2.26
 BuildRequires:	gobject-introspection-devel >= 0.10.0
@@ -35,6 +36,7 @@ BuildRequires:	gstreamer0.10-plugins-base-devel >= 0.10
 BuildRequires:	gtk-doc >= 1.14
 BuildRequires:	intltool >= 0.31.2
 %{?with_gui:BuildRequires:	libnotify-devel}
+BuildRequires:	libusb-devel >= 1.0
 BuildRequires:	libxml2-devel >= 2.0
 BuildRequires:	pkgconfig >= 1:0.14
 BuildRequires:	rpmbuild(macros) >= 1.592
@@ -76,7 +78,7 @@ Summary:	Header files for Aravis library
 Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki Aravis
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
-Requires:	glib2-devel >= 4.0
+Requires:	glib2-devel >= 1:2.32.0
 Requires:	libxml2-devel >= 2.0
 Requires:	zlib-devel
 
@@ -165,13 +167,13 @@ rm -rf $RPM_BUILD_ROOT
 	DESTDIR=$RPM_BUILD_ROOT
 
 # loadable modules
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/gstreamer-*/libgstaravis-0.4.la
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/gstreamer-*/libgstaravis.0.6.la
 # obsoleted by pkg-config
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/libaravis-0.4.la
+%{__rm} $RPM_BUILD_ROOT%{_libdir}/libaravis-0.6.la
 # packaged as %doc
-%{__rm} -r $RPM_BUILD_ROOT%{_prefix}/doc
+%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/aravis
 
-%find_lang %{name}-0.4
+%find_lang %{name}-0.6
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -185,48 +187,51 @@ rm -rf $RPM_BUILD_ROOT
 %postun	viewer
 %update_icon_cache hicolor
 
-%files -f %{name}-0.4.lang
+%files -f %{name}-0.6.lang
 %defattr(644,root,root,755)
 %doc AUTHORS NEWS README.md TODO
-%attr(755,root,root) %{_bindir}/arv-fake-gv-camera-0.4
-%attr(755,root,root) %{_bindir}/arv-tool-0.4
-%attr(755,root,root) %{_libdir}/libaravis-0.4.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libaravis-0.4.so.0
-%{_libdir}/girepository-1.0/Aravis-0.4.typelib
+%attr(755,root,root) %{_bindir}/arv-fake-gv-camera-0.6
+%attr(755,root,root) %{_bindir}/arv-tool-0.6
+%attr(755,root,root) %{_libdir}/libaravis-0.6.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libaravis-0.6.so.0
+%{_libdir}/girepository-1.0/Aravis-0.6.typelib
+%{_mandir}/man1/arv-tool-0.6.1*
 
 %if %{with gui}
 %files viewer
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/arv-viewer
-%{_datadir}/aravis-0.4
+%{_datadir}/aravis-0.6
 %{_datadir}/appdata/arv-viewer.appdata.xml
 %{_desktopdir}/arv-viewer.desktop
-%{_iconsdir}/hicolor/*/apps/aravis.png
+%{_iconsdir}/hicolor/*x*/apps/aravis.png
+%{_iconsdir}/hicolor/scalable/devices/aravis-*-symbolic.svg
+%{_mandir}/man1/arv-viewer.1*
 %endif
 
 %files devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libaravis-0.4.so
-%{_includedir}/aravis-0.4
-%{_datadir}/gir-1.0/Aravis-0.4.gir
-%{_pkgconfigdir}/aravis-0.4.pc
+%attr(755,root,root) %{_libdir}/libaravis-0.6.so
+%{_includedir}/aravis-0.6
+%{_datadir}/gir-1.0/Aravis-0.6.gir
+%{_pkgconfigdir}/aravis-0.6.pc
 
 %files static
 %defattr(644,root,root,755)
-%{_libdir}/libaravis-0.4.a
+%{_libdir}/libaravis-0.6.a
 
 %files apidocs
 %defattr(644,root,root,755)
-%{_gtkdocdir}/aravis-0.4
+%{_gtkdocdir}/aravis-0.6
 
 %if %{with gstreamer0_10}
 %files -n gstreamer0.10-aravis
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/gstreamer-0.10/libgstaravis-0.4.so
+%attr(755,root,root) %{_libdir}/gstreamer-0.10/libgstaravis.0.6.so
 %endif
 
 %if %{with gstreamer1}
 %files -n gstreamer-aravis
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/gstreamer-1.0/libgstaravis-0.4.so
+%attr(755,root,root) %{_libdir}/gstreamer-1.0/libgstaravis.0.6.so
 %endif
