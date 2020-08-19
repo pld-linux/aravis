@@ -1,50 +1,44 @@
 #
 # Conditional build:
 %bcond_without	gui		# Viewer application
-%bcond_without	gstreamer	# alias to disable both GStreamer plugins
-%bcond_without	gstreamer1	# GStreamer 1 plugin
-%bcond_without	gstreamer0_10	# GStreamer 0.10 plugin
+%bcond_without	gstreamer	# GStreamer plugin
 
-%if %{without gstreamer}
-%undefine	with_gstreamer1
-%undefine	with_gstreamer0_10
-%endif
 Summary:	Aravis digital video camera acquisition library
 Summary(pl.UTF-8):	Aravis - biblioteka do pobierania obrazu z kamer cyfrowych
 Name:		aravis
-Version:	0.6.4
+Version:	0.8.0
 Release:	1
 License:	LGPL v2+
 Group:		Libraries
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/aravis/0.6/%{name}-%{version}.tar.xz
-# Source0-md5:	632227c75701dd687648b01e54a03206
+Source0:	http://ftp.gnome.org/pub/GNOME/sources/aravis/0.8/%{name}-%{version}.tar.xz
+# Source0-md5:	8e2f66fbd0cc715cb5794be592063c37
+Patch0:		%{name}-format.patch
 URL:		https://wiki.gnome.org/Projects/Aravis
-BuildRequires:	appstream-glib-devel
+BuildRequires:	appstream-glib
 BuildRequires:	audit-libs-devel
 BuildRequires:	gettext-tools
-BuildRequires:	glib2-devel >= 1:2.26
+BuildRequires:	glib2-devel >= 1:2.44
 BuildRequires:	gobject-introspection-devel >= 0.10.0
-%if %{with gstreamer1} || %{with gui}
+%if %{with gstreamer} || %{with gui}
 BuildRequires:	gstreamer-devel >= 1.0
 BuildRequires:	gstreamer-plugins-base-devel >= 1.0
 %endif
-%if %{with gstreamer0_10}
-BuildRequires:	gstreamer0.10-devel >= 0.10
-BuildRequires:	gstreamer0.10-plugins-base-devel >= 0.10
-%endif
 %{?with_gui:BuildRequires:	gtk+3-devel >= 3.14.0}
 BuildRequires:	gtk-doc >= 1.14
-BuildRequires:	intltool >= 0.31.2
 %{?with_gui:BuildRequires:	libnotify-devel}
 BuildRequires:	libusb-devel >= 1.0
 BuildRequires:	libxml2-devel >= 2.0
+BuildRequires:	libxslt-progs
+BuildRequires:	meson >= 0.47.0
+BuildRequires:	ninja >= 1.5
 BuildRequires:	pkgconfig >= 1:0.14
-BuildRequires:	rpmbuild(macros) >= 1.592
+BuildRequires:	rpmbuild(macros) >= 1.736
 BuildRequires:	tar >= 1:1.22
 BuildRequires:	xz
 BuildRequires:	zlib-devel
-Requires:	glib2 >= 1:2.32.0
+Requires:	glib2 >= 1:2.44
 Requires:	gtk+3 >= 3.14.0
+Obsoletes:	gstreamer0.10-aravis < 0.7
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -78,7 +72,7 @@ Summary:	Header files for Aravis library
 Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki Aravis
 Group:		Development/Libraries
 Requires:	%{name} = %{version}-%{release}
-Requires:	glib2-devel >= 1:2.32.0
+Requires:	glib2-devel >= 1:2.44
 Requires:	libxml2-devel >= 2.0
 Requires:	zlib-devel
 
@@ -105,7 +99,7 @@ Summary:	API documentation for Aravis library
 Summary(pl.UTF-8):	Dokumentacja API biblioteki Aravis
 Group:		Documentation
 Requires:	gtk-doc-common
-%if "%{_rpmversion}" >= "5"
+%if "%{_rpmversion}" >= "4.6"
 BuildArch:	noarch
 %endif
 
@@ -115,65 +109,39 @@ API documentation for Aravis library.
 %description apidocs -l pl.UTF-8
 Dokumentacja API biblioteki Aravis.
 
-%package -n gstreamer0.10-aravis
-Summary:	GStreamer 0.10 plugin for Aravis digital video camera acquisition library
-Summary(pl.UTF-8):	Wtyczka GStreamera 0.10 do biblioteki pobierania obrazu z kamer cyfrowych Aravis
-Group:		Libraries
-Requires:	%{name} = %{version}-%{release}
-Requires:	gstreamer0.10 >= 0.10
-Requires:	gstreamer0.10-plugins-base >= 0.10
-
-%description -n gstreamer0.10-aravis
-GStreamer 0.10 plugin for Aravis digital video camera acquisition
-library.
-
-%description -n gstreamer0.10-aravis -l pl.UTF-8
-Wtyczka GStreamera 0.10 do biblioteki pobierania obrazu z kamer
-cyfrowych Aravis.
-
 %package -n gstreamer-aravis
-Summary:	GStreamer 1 plugin for Aravis digital video camera acquisition library
-Summary(pl.UTF-8):	Wtyczka GStreamera 1 do biblioteki pobierania obrazu z kamer cyfrowych Aravis
+Summary:	GStreamer plugin for Aravis digital video camera acquisition library
+Summary(pl.UTF-8):	Wtyczka GStreamera do biblioteki pobierania obrazu z kamer cyfrowych Aravis
 Group:		Libraries
 Requires:	%{name} = %{version}-%{release}
 Requires:	gstreamer >= 1.0
 Requires:	gstreamer-plugins-base >= 1.0
 
 %description -n gstreamer-aravis
-GStreamer 1 plugin for Aravis digital video camera acquisition
+GStreamer plugin for Aravis digital video camera acquisition
 library.
 
 %description -n gstreamer-aravis -l pl.UTF-8
-Wtyczka GStreamera 1 do biblioteki pobierania obrazu z kamer cyfrowych
+Wtyczka GStreamera do biblioteki pobierania obrazu z kamer cyfrowych
 Aravis.
 
 %prep
 %setup -q
+%patch0 -p1
 
 %build
-%configure \
-	--disable-silent-rules \
-	%{!?with_gstreamer1:--disable-gst-plugin} \
-	%{!?with_gstreamer0_10:--disable-gst-0.10-plugin} \
-	%{!?with_gui:--disable-viewer} \
-	--with-html-dir=%{_gtkdocdir}
+%meson build \
+	%{!?with_gstreamer:-Dgst-plugin=disabled} \
+	%{!?with_gui:-Dviewer=disabled}
 
-%{__make}
+%ninja_build -C build
 
 %install
 rm -rf $RPM_BUILD_ROOT
 
-%{__make} install \
-	DESTDIR=$RPM_BUILD_ROOT
+%ninja_install -C build
 
-# loadable modules
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/gstreamer-*/libgstaravis.0.6.la
-# obsoleted by pkg-config
-%{__rm} $RPM_BUILD_ROOT%{_libdir}/libaravis-0.6.la
-# packaged as %doc
-%{__rm} -r $RPM_BUILD_ROOT%{_docdir}/aravis
-
-%find_lang %{name}-0.6
+%find_lang %{name}-0.8
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -187,51 +155,44 @@ rm -rf $RPM_BUILD_ROOT
 %postun	viewer
 %update_icon_cache hicolor
 
-%files -f %{name}-0.6.lang
+%files -f %{name}-0.8.lang
 %defattr(644,root,root,755)
-%doc AUTHORS NEWS README.md TODO
-%attr(755,root,root) %{_bindir}/arv-fake-gv-camera-0.6
-%attr(755,root,root) %{_bindir}/arv-tool-0.6
-%attr(755,root,root) %{_libdir}/libaravis-0.6.so.*.*.*
-%attr(755,root,root) %ghost %{_libdir}/libaravis-0.6.so.0
-%{_libdir}/girepository-1.0/Aravis-0.6.typelib
-%{_mandir}/man1/arv-tool-0.6.1*
+%doc AUTHORS NEWS.md README.md
+%attr(755,root,root) %{_bindir}/arv-fake-gv-camera-0.8
+%attr(755,root,root) %{_bindir}/arv-tool-0.8
+%attr(755,root,root) %{_libdir}/libaravis-0.8.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libaravis-0.8.so.0
+%{_libdir}/girepository-1.0/Aravis-0.8.typelib
+%{_mandir}/man1/arv-tool-0.8.1*
 
 %if %{with gui}
 %files viewer
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_bindir}/arv-viewer
-%{_datadir}/aravis-0.6
-%{_datadir}/appdata/arv-viewer.appdata.xml
-%{_desktopdir}/arv-viewer.desktop
-%{_iconsdir}/hicolor/*x*/apps/aravis.png
-%{_iconsdir}/hicolor/scalable/devices/aravis-*-symbolic.svg
-%{_mandir}/man1/arv-viewer.1*
+%attr(755,root,root) %{_bindir}/arv-viewer-0.8
+%{_datadir}/aravis-0.8
+%{_datadir}/metainfo/arv-viewer-0.8.appdata.xml
+%{_desktopdir}/arv-viewer-0.8.desktop
+%{_iconsdir}/hicolor/*x*/apps/aravis-0.8.png
+%{_mandir}/man1/arv-viewer-0.8.1*
 %endif
 
 %files devel
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/libaravis-0.6.so
-%{_includedir}/aravis-0.6
-%{_datadir}/gir-1.0/Aravis-0.6.gir
-%{_pkgconfigdir}/aravis-0.6.pc
+%attr(755,root,root) %{_libdir}/libaravis-0.8.so
+%{_includedir}/aravis-0.8
+%{_datadir}/gir-1.0/Aravis-0.8.gir
+%{_pkgconfigdir}/aravis-0.8.pc
 
 %files static
 %defattr(644,root,root,755)
-%{_libdir}/libaravis-0.6.a
+%{_libdir}/libaravis-0.8.a
 
 %files apidocs
 %defattr(644,root,root,755)
-%{_gtkdocdir}/aravis-0.6
+%{_gtkdocdir}/aravis-0.8
 
-%if %{with gstreamer0_10}
-%files -n gstreamer0.10-aravis
-%defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/gstreamer-0.10/libgstaravis.0.6.so
-%endif
-
-%if %{with gstreamer1}
+%if %{with gstreamer}
 %files -n gstreamer-aravis
 %defattr(644,root,root,755)
-%attr(755,root,root) %{_libdir}/gstreamer-1.0/libgstaravis.0.6.so
+%attr(755,root,root) %{_libdir}/gstreamer-1.0/libgstaravis.0.8.so
 %endif
