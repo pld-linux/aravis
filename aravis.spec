@@ -6,12 +6,12 @@
 Summary:	Aravis digital video camera acquisition library
 Summary(pl.UTF-8):	Aravis - biblioteka do pobierania obrazu z kamer cyfrowych
 Name:		aravis
-Version:	0.8.2
+Version:	0.8.4
 Release:	1
 License:	LGPL v2+
 Group:		Libraries
-Source0:	http://ftp.gnome.org/pub/GNOME/sources/aravis/0.8/%{name}-%{version}.tar.xz
-# Source0-md5:	9902058162bfffe810cccfb1286dc1fd
+Source0:	https://download.gnome.org/sources/aravis/0.8/%{name}-%{version}.tar.xz
+# Source0-md5:	41bcb4839529e8e9a471a28809914688
 URL:		https://wiki.gnome.org/Projects/Aravis
 BuildRequires:	appstream-glib
 BuildRequires:	audit-libs-devel
@@ -31,7 +31,7 @@ BuildRequires:	libxslt-progs
 BuildRequires:	meson >= 0.47.0
 BuildRequires:	ninja >= 1.5
 BuildRequires:	pkgconfig >= 1:0.14
-BuildRequires:	rpmbuild(macros) >= 1.736
+BuildRequires:	rpmbuild(macros) >= 1.752
 BuildRequires:	tar >= 1:1.22
 BuildRequires:	xz
 BuildRequires:	zlib-devel
@@ -98,9 +98,7 @@ Summary:	API documentation for Aravis library
 Summary(pl.UTF-8):	Dokumentacja API biblioteki Aravis
 Group:		Documentation
 Requires:	gtk-doc-common
-%if "%{_rpmversion}" >= "4.6"
-BuildArch:	noarch
-%endif
+%{?noarchpackage}
 
 %description apidocs
 API documentation for Aravis library.
@@ -167,7 +165,6 @@ rm -rf $RPM_BUILD_ROOT
 %files viewer
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/arv-viewer-0.8
-%{_datadir}/aravis-0.8
 %{_datadir}/metainfo/arv-viewer-0.8.appdata.xml
 %{_desktopdir}/arv-viewer-0.8.desktop
 %{_iconsdir}/hicolor/*x*/apps/aravis-0.8.png
