@@ -1,0 +1,43 @@
+diff -urN aravis-0.8.10.org/src/arvxmlschema.c aravis-0.8.10/src/arvxmlschema.c
+--- aravis-0.8.10.org/src/arvxmlschema.c	2021-05-12 08:52:35.211482300 +0200
++++ aravis-0.8.10/src/arvxmlschema.c	2025-08-02 00:46:33.591183845 +0200
+@@ -30,6 +30,7 @@
+ #include <libxml/parser.h>
+ #include <libxml/valid.h>
+ #include <libxml/xmlschemas.h>
++#include <libxml/xmlerror.h>
+ #include <gio/gio.h>
+ #include <arvdebugprivate.h>
+ #include <arvmisc.h>
+@@ -69,9 +70,9 @@
+ } XmlSchemaError;
+ 
+ static void
+-_structured_error_handler (void *ctx, xmlErrorPtr error)
++ _structured_error_handler(void *user_data, const xmlError *error)
+ {
+-	XmlSchemaError *schema_error = ctx;
++	XmlSchemaError *schema_error = (XmlSchemaError *)user_data;
+ 
+ 	if (schema_error->error == NULL ||
+ 	    *(schema_error->error) != NULL)
+@@ -188,5 +189,7 @@
+ 
+ 	gobject_class->finalize = _finalize;
+ 
++#if LIBXML_VERSION < 21100
+ 	xmlLineNumbersDefault (1);
++#endif
+ }
+diff -urN aravis-0.8.10.org/viewer/data/meson.build aravis-0.8.10/viewer/data/meson.build
+--- aravis-0.8.10.org/viewer/data/meson.build	2021-05-12 08:52:35.244482300 +0200
++++ aravis-0.8.10/viewer/data/meson.build	2025-08-02 00:46:33.591183845 +0200
+@@ -8,7 +8,7 @@
+ 		configuration: appdata_conf,
+ 		install_dir: aravis_app_data_dir)
+ 
+-desktop = i18n.merge_file ('desktop',
++desktop = i18n.merge_file (
+ 			   input: configure_file (input: files('arv-viewer.desktop.in.in'),
+ 						  output: 'arv-viewer.desktop.in',
+ 						  configuration: appdata_conf),
