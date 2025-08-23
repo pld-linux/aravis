@@ -33,7 +33,7 @@ BuildRequires:	meson >= 0.47.0
 BuildRequires:	ninja >= 1.5
 BuildRequires:	pkgconfig >= 1:0.14
 BuildRequires:	rpm-build >= 4.6
-BuildRequires:	rpmbuild(macros) >= 1.752
+BuildRequires:	rpmbuild(macros) >= 2.042
 BuildRequires:	tar >= 1:1.22
 BuildRequires:	xz
 BuildRequires:	zlib-devel
